@@ -67,7 +67,11 @@ public class CameraFollowListener implements Listener {
                         public void run() {
                             Location camLoc = calculateCameraLocation(target, recorder);
                             if (binding.getCameraMode() == RecorderBinding.MODE_PACKET) {
-                                sendPacketPosition(recorder, camLoc);
+                                // 传送时直接重置平滑状态，避免插值错乱
+                                binding.setCurrentSmoothLocation(camLoc.clone());
+                                binding.setCurrentSmoothYaw(camLoc.getYaw());
+                                binding.setCurrentSmoothPitch(camLoc.getPitch());
+                                sendPacketPosition(recorder, camLoc, camLoc.getYaw(), camLoc.getPitch());
                             } else {
                                 recorder.teleportAsync(camLoc).thenAccept(result -> {
                                     if (!result) {
@@ -154,22 +158,74 @@ public class CameraFollowListener implements Listener {
             recorder.setGameMode(GameMode.SPECTATOR);
         }
 
-        Location camLoc = calculateCameraLocation(target, recorder);
-        sendPacketPosition(recorder, camLoc);
+        // 获取配置的平滑因子
+        double smoothFactor = plugin.getConfigManager().getCameraSmoothFactor();
+        double rotationSmoothFactor = plugin.getConfigManager().getCameraRotationSmoothFactor();
+
+        // 计算理想镜头位置
+        Location idealCamLoc = calculateCameraLocation(target, recorder);
+
+        // --- 位置平滑处理 ---
+        Location currentSmoothLoc = binding.getCurrentSmoothLocation();
+        if (currentSmoothLoc == null) {
+            currentSmoothLoc = idealCamLoc.clone();
+            binding.setCurrentSmoothLocation(currentSmoothLoc);
+        } else {
+            // 确保世界一致，避免跨世界时插值出错
+            if (!currentSmoothLoc.getWorld().equals(idealCamLoc.getWorld())) {
+                currentSmoothLoc = idealCamLoc.clone();
+            } else {
+                // 线性插值：当前位置 + (目标位置 - 当前位置) * 平滑因子
+                currentSmoothLoc.setX(currentSmoothLoc.getX() + (idealCamLoc.getX() - currentSmoothLoc.getX()) * smoothFactor);
+                currentSmoothLoc.setY(currentSmoothLoc.getY() + (idealCamLoc.getY() - currentSmoothLoc.getY()) * smoothFactor);
+                currentSmoothLoc.setZ(currentSmoothLoc.getZ() + (idealCamLoc.getZ() - currentSmoothLoc.getZ()) * smoothFactor);
+            }
+            binding.setCurrentSmoothLocation(currentSmoothLoc);
+        }
+
+        // --- 视角平滑处理 ---
+        float currentSmoothYaw = binding.getCurrentSmoothYaw();
+        float currentSmoothPitch = binding.getCurrentSmoothPitch();
+        float idealYaw = idealCamLoc.getYaw();
+        float idealPitch = idealCamLoc.getPitch();
+
+        // 如果尚未初始化，则直接使用理想值
+        if (binding.getCurrentSmoothLocation() == null) {
+            currentSmoothYaw = idealYaw;
+            currentSmoothPitch = idealPitch;
+        } else {
+            // 处理 Yaw 的跨越 -180/180 边界问题
+            float yawDiff = idealYaw - currentSmoothYaw;
+            if (yawDiff > 180) yawDiff -= 360;
+            if (yawDiff < -180) yawDiff += 360;
+            currentSmoothYaw += yawDiff * rotationSmoothFactor;
+            // 归一化到 [-180, 180)
+            if (currentSmoothYaw >= 180) currentSmoothYaw -= 360;
+            if (currentSmoothYaw < -180) currentSmoothYaw += 360;
+
+            // Pitch 不需要特殊处理，范围在 -90 到 90
+            currentSmoothPitch += (idealPitch - currentSmoothPitch) * rotationSmoothFactor;
+        }
+
+        binding.setCurrentSmoothYaw(currentSmoothYaw);
+        binding.setCurrentSmoothPitch(currentSmoothPitch);
+
+        // 发送平滑后的位置和视角
+        sendPacketPosition(recorder, currentSmoothLoc, currentSmoothYaw, currentSmoothPitch);
 
         if (plugin.getConfigManager().isParticlesEnabled()) {
-            target.getWorld().spawnParticle(Particle.END_ROD, camLoc, 1, 0, 0, 0, 0);
+            target.getWorld().spawnParticle(Particle.END_ROD, currentSmoothLoc, 1, 0, 0, 0, 0);
         }
     }
 
-    private void sendPacketPosition(Player player, Location location) {
+    private void sendPacketPosition(Player player, Location location, float yaw, float pitch) {
         User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
         if (user == null) return;
 
         WrapperPlayServerPlayerPositionAndLook packet = new WrapperPlayServerPlayerPositionAndLook(
                 new Vector3d(location.getX(), location.getY(), location.getZ()),
-                location.getYaw(),
-                location.getPitch(),
+                yaw,
+                pitch,
                 (byte) 0x00,
                 0,
                 false

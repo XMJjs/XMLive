@@ -1,10 +1,15 @@
 package com.xmjjs.xmlive.listeners;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.util.Vector3d;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerPositionAndLook;
 import com.xmjjs.xmlive.XMLive;
 import com.xmjjs.xmlive.core.RecorderBinding;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Player;
@@ -61,11 +66,15 @@ public class CameraFollowListener implements Listener {
                         @Override
                         public void run() {
                             Location camLoc = calculateCameraLocation(target, recorder);
-                            recorder.teleportAsync(camLoc).thenAccept(result -> {
-                                if (!result) {
-                                    plugin.getLogger().warning("录制者 " + recorder.getName() + " 传送失败");
-                                }
-                            });
+                            if (binding.getCameraMode() == RecorderBinding.MODE_PACKET) {
+                                sendPacketPosition(recorder, camLoc);
+                            } else {
+                                recorder.teleportAsync(camLoc).thenAccept(result -> {
+                                    if (!result) {
+                                        plugin.getLogger().warning("录制者 " + recorder.getName() + " 传送失败");
+                                    }
+                                });
+                            }
                         }
                     }.runTask(plugin);
                 }
@@ -89,7 +98,11 @@ public class CameraFollowListener implements Listener {
                 }
                 lastUpdateTick.put(recorder.getUniqueId(), currentTick);
 
-                applySmoothCameraMovement(recorder, target);
+                if (binding.getCameraMode() == RecorderBinding.MODE_PACKET) {
+                    applyPacketCameraMovement(recorder, target, binding);
+                } else {
+                    applySmoothCameraMovement(recorder, target);
+                }
                 sendActionBarStatus(recorder, target);
             }
         }
@@ -99,11 +112,16 @@ public class CameraFollowListener implements Listener {
         Location camLoc = calculateCameraLocation(target, recorder);
         Location recorderLoc = recorder.getLocation();
 
-        // 更新录制者视角
-        recorder.setRotation(camLoc.getYaw(), camLoc.getPitch());
+        float targetYaw = camLoc.getYaw();
+        float targetPitch = camLoc.getPitch();
+
+        float yawDiff = Math.abs(targetYaw - recorderLoc.getYaw());
+        float pitchDiff = Math.abs(targetPitch - recorderLoc.getPitch());
+        if (yawDiff > 1.0f || pitchDiff > 1.0f) {
+            recorder.setRotation(targetYaw, targetPitch);
+        }
 
         Vector direction = camLoc.toVector().subtract(recorderLoc.toVector());
-
         if (direction.lengthSquared() < 0.01) {
             return;
         }
@@ -114,6 +132,34 @@ public class CameraFollowListener implements Listener {
         if (plugin.getConfigManager().isParticlesEnabled()) {
             target.getWorld().spawnParticle(Particle.END_ROD, camLoc, 1, 0, 0, 0, 0);
         }
+    }
+
+    private void applyPacketCameraMovement(Player recorder, Player target, RecorderBinding binding) {
+        if (recorder.getGameMode() != GameMode.SPECTATOR) {
+            recorder.setGameMode(GameMode.SPECTATOR);
+        }
+
+        Location camLoc = calculateCameraLocation(target, recorder);
+        sendPacketPosition(recorder, camLoc);
+
+        if (plugin.getConfigManager().isParticlesEnabled()) {
+            target.getWorld().spawnParticle(Particle.END_ROD, camLoc, 1, 0, 0, 0, 0);
+        }
+    }
+
+    private void sendPacketPosition(Player player, Location location) {
+        User user = PacketEvents.getAPI().getPlayerManager().getUser(player);
+        if (user == null) return;
+
+        WrapperPlayServerPlayerPositionAndLook packet = new WrapperPlayServerPlayerPositionAndLook(
+                new Vector3d(location.getX(), location.getY(), location.getZ()),
+                location.getYaw(),
+                location.getPitch(),
+                (byte) 0x00,
+                0,
+                false
+        );
+        user.sendPacket(packet);
     }
 
     private Location calculateCameraLocation(Player target, Player recorder) {
@@ -152,11 +198,14 @@ public class CameraFollowListener implements Listener {
         RecorderBinding binding = plugin.getLiveCore().getBinding(recorder);
         if (binding == null) return;
         String mode = binding.isAutoMode() ? "自动模式 (" + binding.getInterval() + "s)" : "手动模式";
+        String camMode = binding.getCameraMode() == RecorderBinding.MODE_VELOCITY ? "速度" : "数据包";
         Component message = Component.text()
                 .append(Component.text("目标: ", NamedTextColor.GRAY))
                 .append(Component.text(target.getName(), NamedTextColor.GREEN))
                 .append(Component.text(" | 模式: ", NamedTextColor.GRAY))
                 .append(Component.text(mode, NamedTextColor.YELLOW))
+                .append(Component.text(" | 镜头: ", NamedTextColor.GRAY))
+                .append(Component.text(camMode, NamedTextColor.LIGHT_PURPLE))
                 .build();
         recorder.sendActionBar(message);
     }

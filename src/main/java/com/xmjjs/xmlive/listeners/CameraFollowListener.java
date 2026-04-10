@@ -1,8 +1,8 @@
 // src/main/java/com/yourpackage/xmlive/listeners/CameraFollowListener.java
-package com.xmjjs.xmllive.listeners;
+package com.xmjjs.xmlive.listeners;
 
-import com.xmjjs.xmllive.XMLive;
-import com.xmjjs.xmllive.core.RecorderBinding;
+import com.xmjjs.xmlive.XMLive;
+import com.xmjjs.xmlive.core.RecorderBinding;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;

@@ -1,0 +1,43 @@
+# XMLIVE 配置文件
+# 授权设置
+auth:
+  # 启用令牌验证
+  enabled: true
+  # 允许使用插件的玩家列表，格式: "玩家名:令牌"
+  players:
+    - "cameraman1:your-secret-token-123"
+    - "cameraman2:another-secret-token-456"
+
+# 镜头设置
+camera:
+  # 镜头距离（格）
+  distance: 4.0
+  # 镜头俯角（度）
+  pitch: 220
+  # 镜头位置平滑因子（0.0~1.0），值越小跟随越平滑但延迟感越强
+  smooth-factor: 0.3
+  # 视角旋转平滑因子（0.0~1.0），值越小转动越平滑
+  rotation-smooth-factor: 0.5
+  
+# 自动模式设置
+auto:
+  # 默认切换间隔（秒），如果命令中未指定间隔，则使用此值
+  default-interval: 30
+
+# 更新设置
+update:
+  # 更新频率（游戏刻，1刻 = 0.05秒）。数值越小越流畅，但CPU占用越高。
+  # 1 = 最流畅，2 = 推荐，5 = 省资源
+  frequency: 1
+
+# 视觉反馈
+visual:
+  # 自动为目标玩家添加发光效果
+  glowing: true
+  # 在镜头位置显示粒子效果（需要时可开启）
+  particles: false
+
+  # 速度跟随设置
+velocity:
+  # 力度系数，推荐值 0.6 ~ 1.2。数值越大跟随越紧但可能显得突兀，越小越平滑但会有延迟感。
+  strength: 0.9

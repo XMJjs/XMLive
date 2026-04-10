@@ -32,3 +32,8 @@ visual:
   glowing: true
   # 在镜头位置显示粒子效果（需要时可开启）
   particles: false
+
+# 速度跟随设置
+velocity:
+  # 力度系数，推荐值 0.6 ~ 1.2。数值越大跟随越紧但可能显得突兀，越小越平滑但会有延迟感。
+  strength: 0.9

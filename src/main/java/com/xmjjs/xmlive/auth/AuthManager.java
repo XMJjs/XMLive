@@ -1,7 +1,7 @@
 // src/main/java/com/yourpackage/xmlive/auth/AuthManager.java
-package com.xmjjs.xmllive.auth;
+package com.xmjjs.xmlive.auth;
 
-import com.xmjjs.xmllive.XMLive;
+import com.xmjjs.xmlive.XMLive;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;

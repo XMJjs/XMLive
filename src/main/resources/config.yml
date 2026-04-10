@@ -5,14 +5,15 @@ auth:
   enabled: true
   # 允许使用插件的玩家列表，格式: "玩家名:令牌"
   players:
-    - "cameraman1:token-123"
+    - "cameraman1:your-secret-token-123"
+    - "cameraman2:another-secret-token-456"
 
 # 镜头设置
 camera:
   # 镜头距离（格）
-  distance: 3.0
+  distance: 4.0
   # 镜头俯角（度）
-  pitch: -90
+  pitch: 220
 
 # 自动模式设置
 auto:

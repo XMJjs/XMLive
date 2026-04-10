@@ -135,6 +135,21 @@ public class CameraFollowListener implements Listener {
     }
 
     private void applyPacketCameraMovement(Player recorder, Player target, RecorderBinding binding) {
+        // 检查 PacketEvents 是否已成功加载
+        try {
+            if (!PacketEvents.getAPI().isLoaded()) {
+                recorder.sendMessage(Component.text("数据包模式不可用：PacketEvents 未加载，已自动回退到速度模式。", NamedTextColor.RED));
+                binding.setCameraMode(RecorderBinding.MODE_VELOCITY);
+                applySmoothCameraMovement(recorder, target);
+                return;
+            }
+        } catch (Exception e) {
+            recorder.sendMessage(Component.text("数据包模式不可用：PacketEvents 状态异常，已自动回退到速度模式。", NamedTextColor.RED));
+            binding.setCameraMode(RecorderBinding.MODE_VELOCITY);
+            applySmoothCameraMovement(recorder, target);
+            return;
+        }
+
         if (recorder.getGameMode() != GameMode.SPECTATOR) {
             recorder.setGameMode(GameMode.SPECTATOR);
         }

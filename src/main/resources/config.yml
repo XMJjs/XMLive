@@ -14,10 +14,7 @@ camera:
   distance: 4.0
   # 镜头俯角（度）
   pitch: 220
-  # 镜头位置平滑因子（0.0~1.0），值越小跟随越平滑但延迟感越强
-  smooth-factor: 0.3
-  # 视角旋转平滑因子（0.0~1.0），值越小转动越平滑
-  rotation-smooth-factor: 0.5
+
   
 # 自动模式设置
 auto:

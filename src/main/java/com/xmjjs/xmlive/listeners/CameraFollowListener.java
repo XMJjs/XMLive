@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -31,24 +32,16 @@ public class CameraFollowListener implements Listener {
         this.plugin = plugin;
     }
 
-    /**
-     * 当目标玩家自己移动时（走路、跑步、跳跃、飞行等）
-     */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerMove(PlayerMoveEvent event) {
         handleTargetMovement(event.getPlayer());
     }
 
-    /**
-     * 当目标玩家乘坐载具移动时（矿车、船、马等）
-     */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onVehicleMove(VehicleMoveEvent event) {
-        // 检查载具上的乘客是否有我们的目标玩家
         for (RecorderBinding binding : plugin.getLiveCore().getAllBindings()) {
             Player target = Bukkit.getPlayer(binding.getTargetUuid());
             if (target != null && target.isOnline() && target.isInsideVehicle()) {
-                // 如果目标玩家正是当前移动载具的乘客，则触发更新
                 if (target.getVehicle() != null && target.getVehicle().equals(event.getVehicle())) {
                     handleTargetMovement(target);
                     break;
@@ -57,9 +50,6 @@ public class CameraFollowListener implements Listener {
         }
     }
 
-    /**
-     * 处理目标玩家传送事件，确保录制者立即同步位置
-     */
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         Player target = event.getPlayer();
@@ -70,6 +60,7 @@ public class CameraFollowListener implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
+                            // 目标玩家传送时，录制者需要瞬间到位（这里仍用传送，因为跨越较大距离）
                             Location camLoc = calculateCameraLocation(target, recorder);
                             recorder.teleportAsync(camLoc).thenAccept(result -> {
                                 if (!result) {
@@ -83,10 +74,6 @@ public class CameraFollowListener implements Listener {
         }
     }
 
-    /**
-     * 统一处理目标玩家位置变化后的镜头更新
-     * 包含节流逻辑，按照配置的频率执行
-     */
     private void handleTargetMovement(Player target) {
         for (RecorderBinding binding : plugin.getLiveCore().getAllBindings()) {
             if (binding.getTargetUuid().equals(target.getUniqueId())) {
@@ -95,7 +82,7 @@ public class CameraFollowListener implements Listener {
                     continue;
                 }
 
-                // 节流：根据配置的 update-frequency 限制实际更新次数
+                // 节流控制
                 int currentTick = Bukkit.getCurrentTick();
                 int freq = plugin.getConfigManager().getUpdateFrequency();
                 int lastTick = lastUpdateTick.getOrDefault(recorder.getUniqueId(), 0);
@@ -104,20 +91,35 @@ public class CameraFollowListener implements Listener {
                 }
                 lastUpdateTick.put(recorder.getUniqueId(), currentTick);
 
-                // 更新镜头位置并发送状态栏
-                updateCameraPosition(recorder, target);
+                // 使用速度驱动移动（不再传送）
+                applySmoothCameraMovement(recorder, target);
                 sendActionBarStatus(recorder, target);
             }
         }
     }
 
-    private void updateCameraPosition(Player recorder, Player target) {
+    /**
+     * 通过 setVelocity 驱动录制者平滑移动到目标镜头位置
+     */
+    private void applySmoothCameraMovement(Player recorder, Player target) {
         Location camLoc = calculateCameraLocation(target, recorder);
-        recorder.teleportAsync(camLoc).thenAccept(result -> {
-            if (!result) {
-                plugin.getLogger().warning("录制者 " + recorder.getName() + " 传送失败");
-            }
-        });
+        Location recorderLoc = recorder.getLocation();
+
+        // 计算从录制者当前位置指向镜头位置的方向向量
+        Vector direction = camLoc.toVector().subtract(recorderLoc.toVector());
+
+        // 如果距离非常小，直接传送避免微小的速度抖动
+        if (direction.lengthSquared() < 0.01) {
+            return;
+        }
+
+        // 从配置文件读取力度系数（稍后需要添加到 ConfigManager 和 config.yml）
+        double strength = plugin.getConfigManager().getVelocityStrength();
+
+        // 施加速度
+        recorder.setVelocity(direction.multiply(strength));
+
+        // 可选粒子效果
         if (plugin.getConfigManager().isParticlesEnabled()) {
             target.getWorld().spawnParticle(Particle.END_ROD, camLoc, 1, 0, 0, 0, 0);
         }

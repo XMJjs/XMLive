@@ -3,10 +3,10 @@ name: Build XMLIVE Plugin
 
 # 触发条件：推送到 main 分支时自动构建
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  #push:
+  #  branches: [ "main" ]
+  #pull_request:
+  #  branches: [ "main" ]
   workflow_dispatch: # 允许在 Actions 页面手动触发
 
 jobs:

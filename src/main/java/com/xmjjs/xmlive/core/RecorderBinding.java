@@ -1,13 +1,19 @@
-// src/main/java/com/yourpackage/xmlive/core/RecorderBinding.java
 package com.xmjjs.xmlive.core;
+
+import org.bukkit.GameMode;
 
 import java.util.UUID;
 
 public class RecorderBinding {
+
     private final UUID recorderUuid;
     private UUID targetUuid;
     private boolean autoMode;
-    private int interval; // 自动切换间隔（秒）
+    private int interval;
+    private double customDistance = -1.0;
+    private double customPitch = -1.0;
+    private boolean spectatorMode = false;
+    private GameMode previousGameMode;
 
     public RecorderBinding(UUID recorderUuid, UUID targetUuid, boolean autoMode, int interval) {
         this.recorderUuid = recorderUuid;
@@ -42,5 +48,45 @@ public class RecorderBinding {
 
     public void setInterval(int interval) {
         this.interval = interval;
+    }
+
+    public double getCustomDistance() {
+        return customDistance;
+    }
+
+    public void setCustomDistance(double customDistance) {
+        this.customDistance = customDistance;
+    }
+
+    public double getCustomPitch() {
+        return customPitch;
+    }
+
+    public void setCustomPitch(double customPitch) {
+        this.customPitch = customPitch;
+    }
+
+    public double getEffectiveDistance(double globalDistance) {
+        return customDistance > 0 ? customDistance : globalDistance;
+    }
+
+    public double getEffectivePitch(double globalPitch) {
+        return customPitch > 0 ? customPitch : globalPitch;
+    }
+
+    public boolean isSpectatorMode() {
+        return spectatorMode;
+    }
+
+    public void setSpectatorMode(boolean spectatorMode) {
+        this.spectatorMode = spectatorMode;
+    }
+
+    public GameMode getPreviousGameMode() {
+        return previousGameMode;
+    }
+
+    public void setPreviousGameMode(GameMode previousGameMode) {
+        this.previousGameMode = previousGameMode;
     }
 }

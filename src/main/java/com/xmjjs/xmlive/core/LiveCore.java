@@ -24,6 +24,7 @@ public class LiveCore {
     }
 
     public void unbind(Player recorder) {
+        recorder.setVelocity(new Vector(0, 0, 0));
         bindings.remove(recorder.getUniqueId());
         cancelAutoTask(recorder.getUniqueId());
     }

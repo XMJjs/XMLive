@@ -1,12 +1,12 @@
-// src/main/java/com/yourpackage/xmlive/XMLive.java
-package com.yourpackage.xmllive;
+// src/main/java/com/XMLIVE/xmlive/XMLive.java
+package com.XMLIVE.xmllive;
 
-import com.yourpackage.xmllive.auth.AuthManager;
-import com.yourpackage.xmllive.commands.XLCommand;
-import com.yourpackage.xmllive.config.ConfigManager;
-import com.yourpackage.xmllive.core.LiveCore;
-import com.yourpackage.xmllive.listeners.CameraFollowListener;
-import com.yourpackage.xmllive.listeners.RecorderRestrictListener;
+import com.XMLIVE.xmllive.auth.AuthManager;
+import com.XMLIVE.xmllive.commands.XLCommand;
+import com.XMLIVE.xmllive.config.ConfigManager;
+import com.XMLIVE.xmllive.core.LiveCore;
+import com.XMLIVE.xmllive.listeners.CameraFollowListener;
+import com.XMLIVE.xmllive.listeners.RecorderRestrictListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class XMLive extends JavaPlugin {

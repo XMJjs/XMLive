@@ -99,6 +99,9 @@ public class CameraFollowListener implements Listener {
         Location camLoc = calculateCameraLocation(target, recorder);
         Location recorderLoc = recorder.getLocation();
 
+        // 更新录制者视角
+        recorder.setRotation(camLoc.getYaw(), camLoc.getPitch());
+
         Vector direction = camLoc.toVector().subtract(recorderLoc.toVector());
 
         if (direction.lengthSquared() < 0.01) {

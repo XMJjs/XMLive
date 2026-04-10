@@ -1,7 +1,7 @@
 // src/main/java/com/yourpackage/xmlive/listeners/RecorderRestrictListener.java
-package com.xmjjs.xmllive.listeners;
+package com.xmjjs.xmlive.listeners;
 
-import com.xmjjs.xmllive.XMLive;
+import com.xmjjs.xmlive.XMLive;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

@@ -1,6 +1,6 @@
 name: XMLIVE
 version: ${version}
-main: com.yourpackage.xmlive.XMLive
+main: com.XMLIVE.xmlive.XMLive
 api-version: '1.21'
 author: YourName
 description: A third-person camera follow system for live streaming.

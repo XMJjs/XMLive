@@ -28,7 +28,10 @@ tasks {
     }
     jar {
         archiveFileName.set("XMLIVE-${project.version}.jar")
-// 添加一个任务，用于打印当前项目的版本号，供 GitHub Actions 获取
+    }
+}
+
+// 独立任务：打印版本号，供 GitHub Actions 使用
 tasks.register("printVersion") {
     doLast {
         println(project.version)

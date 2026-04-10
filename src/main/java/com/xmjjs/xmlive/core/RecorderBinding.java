@@ -1,5 +1,5 @@
 // src/main/java/com/yourpackage/xmlive/core/RecorderBinding.java
-package com.xmjjs.xmllive.core;
+package com.xmjjs.xmlive.core;
 
 import java.util.UUID;
 

@@ -1,12 +1,11 @@
-// src/main/java/com/yourpackage/xmlive/config/ConfigManager.java
 package com.xmjjs.xmlive.config;
 
 import com.xmjjs.xmlive.XMLive;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 public class ConfigManager {
 
@@ -23,7 +22,6 @@ public class ConfigManager {
         this.config = plugin.getConfig();
     }
 
-    // --- 授权相关 ---
     public boolean isAuthEnabled() {
         return config.getBoolean("auth.enabled", true);
     }
@@ -43,7 +41,6 @@ public class ConfigManager {
         return map;
     }
 
-    // --- 镜头参数 ---
     public double getCameraDistance() {
         return config.getDouble("camera.distance", 3.0);
     }
@@ -52,17 +49,14 @@ public class ConfigManager {
         return config.getDouble("camera.pitch", 45.0);
     }
 
-    // --- 自动模式 ---
     public int getDefaultInterval() {
         return config.getInt("auto.default-interval", 30);
     }
 
-    // --- 更新频率 ---
     public int getUpdateFrequency() {
         return config.getInt("update.frequency", 2);
     }
 
-    // --- 视觉反馈 ---
     public boolean isGlowingEnabled() {
         return config.getBoolean("visual.glowing", true);
     }

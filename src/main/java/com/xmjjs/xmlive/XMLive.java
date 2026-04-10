@@ -1,7 +1,6 @@
 package com.xmjjs.xmlive;
 
 import com.github.retrooper.packetevents.PacketEvents;
-import io.github.retrooper.packetevents.PacketEventsAPI;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import com.xmjjs.xmlive.auth.AuthManager;
 import com.xmjjs.xmlive.commands.XLCommand;
@@ -17,14 +16,12 @@ public final class XMLive extends JavaPlugin {
     private ConfigManager configManager;
     private AuthManager authManager;
     private LiveCore liveCore;
-    private PacketEventsAPI<?> packetEventsAPI;
 
     @Override
     public void onLoad() {
-        // 构建并设置 PacketEvents API 实例
-        packetEventsAPI = SpigotPacketEventsBuilder.build(this);
-        PacketEvents.setAPI(packetEventsAPI);
-        packetEventsAPI.load();
+        // 设置 PacketEvents API 并加载
+        PacketEvents.setAPI(SpigotPacketEventsBuilder.build(this));
+        PacketEvents.getAPI().load();
     }
 
     @Override
@@ -33,7 +30,7 @@ public final class XMLive extends JavaPlugin {
         saveDefaultConfig();
 
         // 初始化 PacketEvents
-        packetEventsAPI.init();
+        PacketEvents.getAPI().init();
 
         configManager = new ConfigManager(this);
         authManager = new AuthManager(this);
@@ -52,9 +49,7 @@ public final class XMLive extends JavaPlugin {
     @Override
     public void onDisable() {
         // 安全终止 PacketEvents
-        if (packetEventsAPI != null) {
-            packetEventsAPI.terminate();
-        }
+        PacketEvents.getAPI().terminate();
         if (liveCore != null) {
             liveCore.shutdown();
         }

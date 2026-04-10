@@ -1,6 +1,7 @@
 package com.xmjjs.xmlive.core;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 
 import java.util.UUID;
 
@@ -18,6 +19,11 @@ public class RecorderBinding {
     private boolean spectatorMode = false;
     private GameMode previousGameMode;
     private int cameraMode = MODE_VELOCITY;
+
+    // 新增：用于平滑处理的中间状态
+    private Location currentSmoothLocation;
+    private float currentSmoothYaw;
+    private float currentSmoothPitch;
 
     public RecorderBinding(UUID recorderUuid, UUID targetUuid, boolean autoMode, int interval) {
         this.recorderUuid = recorderUuid;
@@ -100,5 +106,30 @@ public class RecorderBinding {
 
     public void setCameraMode(int cameraMode) {
         this.cameraMode = cameraMode;
+    }
+
+    // 新增 getter/setter
+    public Location getCurrentSmoothLocation() {
+        return currentSmoothLocation;
+    }
+
+    public void setCurrentSmoothLocation(Location currentSmoothLocation) {
+        this.currentSmoothLocation = currentSmoothLocation;
+    }
+
+    public float getCurrentSmoothYaw() {
+        return currentSmoothYaw;
+    }
+
+    public void setCurrentSmoothYaw(float currentSmoothYaw) {
+        this.currentSmoothYaw = currentSmoothYaw;
+    }
+
+    public float getCurrentSmoothPitch() {
+        return currentSmoothPitch;
+    }
+
+    public void setCurrentSmoothPitch(float currentSmoothPitch) {
+        this.currentSmoothPitch = currentSmoothPitch;
     }
 }

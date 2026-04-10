@@ -13,6 +13,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.math.BigDecimal;
@@ -30,27 +31,35 @@ public class CameraFollowListener implements Listener {
         this.plugin = plugin;
     }
 
+    /**
+     * 当目标玩家自己移动时（走路、跑步、跳跃、飞行等）
+     */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerMove(PlayerMoveEvent event) {
-        Player target = event.getPlayer();
+        handleTargetMovement(event.getPlayer());
+    }
+
+    /**
+     * 当目标玩家乘坐载具移动时（矿车、船、马等）
+     */
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onVehicleMove(VehicleMoveEvent event) {
+        // 检查载具上的乘客是否有我们的目标玩家
         for (RecorderBinding binding : plugin.getLiveCore().getAllBindings()) {
-            if (binding.getTargetUuid().equals(target.getUniqueId())) {
-                Player recorder = Bukkit.getPlayer(binding.getRecorderUuid());
-                if (recorder != null && recorder.isOnline()) {
-                    int currentTick = Bukkit.getCurrentTick();
-                    int freq = plugin.getConfigManager().getUpdateFrequency();
-                    int lastTick = lastUpdateTick.getOrDefault(recorder.getUniqueId(), 0);
-                    if (currentTick - lastTick < freq) {
-                        continue;
-                    }
-                    lastUpdateTick.put(recorder.getUniqueId(), currentTick);
-                    updateCameraPosition(recorder, target);
-                    sendActionBarStatus(recorder, target);
+            Player target = Bukkit.getPlayer(binding.getTargetUuid());
+            if (target != null && target.isOnline() && target.isInsideVehicle()) {
+                // 如果目标玩家正是当前移动载具的乘客，则触发更新
+                if (target.getVehicle() != null && target.getVehicle().equals(event.getVehicle())) {
+                    handleTargetMovement(target);
+                    break;
                 }
             }
         }
     }
 
+    /**
+     * 处理目标玩家传送事件，确保录制者立即同步位置
+     */
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         Player target = event.getPlayer();
@@ -70,6 +79,34 @@ public class CameraFollowListener implements Listener {
                         }
                     }.runTask(plugin);
                 }
+            }
+        }
+    }
+
+    /**
+     * 统一处理目标玩家位置变化后的镜头更新
+     * 包含节流逻辑，按照配置的频率执行
+     */
+    private void handleTargetMovement(Player target) {
+        for (RecorderBinding binding : plugin.getLiveCore().getAllBindings()) {
+            if (binding.getTargetUuid().equals(target.getUniqueId())) {
+                Player recorder = Bukkit.getPlayer(binding.getRecorderUuid());
+                if (recorder == null || !recorder.isOnline()) {
+                    continue;
+                }
+
+                // 节流：根据配置的 update-frequency 限制实际更新次数
+                int currentTick = Bukkit.getCurrentTick();
+                int freq = plugin.getConfigManager().getUpdateFrequency();
+                int lastTick = lastUpdateTick.getOrDefault(recorder.getUniqueId(), 0);
+                if (currentTick - lastTick < freq) {
+                    continue;
+                }
+                lastUpdateTick.put(recorder.getUniqueId(), currentTick);
+
+                // 更新镜头位置并发送状态栏
+                updateCameraPosition(recorder, target);
+                sendActionBarStatus(recorder, target);
             }
         }
     }

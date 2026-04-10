@@ -33,13 +33,13 @@ jobs:
       - name: Get plugin version
         id: get_version
         run: |
-          VERSION=$(gradlew printVersion --quiet)
+          VERSION=$(gradle printVersion --quiet)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "Plugin version: $VERSION"
 
       # 5. 使用 Gradle 构建插件
       - name: Build with Gradle
-        run: gradlew clean build
+        run: gradle clean build
 
       # 6. 创建 Release 并上传构建产物
       - name: Create Release and Upload Asset

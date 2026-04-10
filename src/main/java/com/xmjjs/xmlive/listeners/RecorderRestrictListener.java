@@ -1,4 +1,3 @@
-// src/main/java/com/yourpackage/xmlive/listeners/RecorderRestrictListener.java
 package com.xmjjs.xmlive.listeners;
 
 import com.xmjjs.xmlive.XMLive;
@@ -20,7 +19,6 @@ public class RecorderRestrictListener implements Listener {
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent event) {
         if (event.getPlayer() instanceof Player player) {
-            // 如果玩家是录制者，阻止打开背包/容器
             if (plugin.getLiveCore().getBinding(player) != null) {
                 event.setCancelled(true);
             }
@@ -30,7 +28,6 @@ public class RecorderRestrictListener implements Listener {
     @EventHandler
     public void onItemDrop(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        // 如果玩家是录制者，阻止丢弃物品
         if (plugin.getLiveCore().getBinding(player) != null) {
             event.setCancelled(true);
         }
@@ -39,7 +36,6 @@ public class RecorderRestrictListener implements Listener {
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        // 如果玩家是录制者，阻止与方块/物品交互（可根据需要细化）
         if (plugin.getLiveCore().getBinding(player) != null) {
             event.setCancelled(true);
         }

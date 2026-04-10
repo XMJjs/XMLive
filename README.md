@@ -2,7 +2,6 @@
 
 ## 注意！本项目完全由AI编写！
 
-[![Build Status](https://github.com/XMJjs/XMLive/actions/workflows/build.yml/badge.svg)](https://github.com/XMJjs/XMLive/actions)
 [![MC Version](https://img.shields.io/badge/Minecraft-1.21%2B-brightgreen)](https://papermc.io)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 

@@ -231,6 +231,7 @@ public class XLCommand implements CommandExecutor, TabCompleter {
             player.setInvisible(false);
             player.setInvulnerable(false);
             player.sendMessage(Component.text("已退出录制状态", NamedTextColor.GREEN));
+            player.setVelocity(new Vector(0, 0, 0));  // 停止移动
         }
     }
 

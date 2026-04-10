@@ -38,7 +38,7 @@ public class XLCommand implements CommandExecutor, TabCompleter {
         String subCommand = args[0].toLowerCase();
 
         // 权限检查
-        if (subCommand.equals("login") || subCommand.equals("camera") || subCommand.equals("toggle")) {
+        if (subCommand.equals("login") || subCommand.equals("camera") || subCommand.equals("toggle") || subCommand.equals("mode")) {
             if (!sender.hasPermission("xmlive.use")) {
                 sender.sendMessage(Component.text("你没有权限使用此命令。", NamedTextColor.RED));
                 return true;
@@ -106,6 +106,18 @@ public class XLCommand implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 handleToggle(player);
+                break;
+
+            case "mode":
+                if (!(sender instanceof Player player)) {
+                    sender.sendMessage(Component.text("该命令只能由玩家执行。", NamedTextColor.RED));
+                    return true;
+                }
+                if (args.length < 2) {
+                    player.sendMessage(Component.text("用法: /xl mode <velocity|packet>", NamedTextColor.RED));
+                    return true;
+                }
+                handleMode(player, args[1]);
                 break;
 
             case "reset":
@@ -236,6 +248,30 @@ public class XLCommand implements CommandExecutor, TabCompleter {
         }
     }
 
+    private void handleMode(Player player, String modeArg) {
+        RecorderBinding binding = plugin.getLiveCore().getBinding(player);
+        if (binding == null) {
+            player.sendMessage(Component.text("你尚未绑定目标，无法切换镜头模式。", NamedTextColor.RED));
+            return;
+        }
+
+        int newMode;
+        String modeName;
+        if (modeArg.equalsIgnoreCase("velocity")) {
+            newMode = RecorderBinding.MODE_VELOCITY;
+            modeName = "速度跟随";
+        } else if (modeArg.equalsIgnoreCase("packet")) {
+            newMode = RecorderBinding.MODE_PACKET;
+            modeName = "数据包控制";
+        } else {
+            player.sendMessage(Component.text("无效的模式，请使用 velocity 或 packet。", NamedTextColor.RED));
+            return;
+        }
+
+        binding.setCameraMode(newMode);
+        player.sendMessage(Component.text("镜头模式已切换为：" + modeName, NamedTextColor.GREEN));
+    }
+
     private void handleReset(CommandSender sender) {
         for (RecorderBinding binding : plugin.getLiveCore().getAllBindings()) {
             if (binding.isAutoMode()) {
@@ -262,11 +298,13 @@ public class XLCommand implements CommandExecutor, TabCompleter {
             String recorderName = recorder != null ? recorder.getName() : "离线";
             String targetName = target != null ? target.getName() : "离线";
             String mode = binding.isAutoMode() ? "自动 (" + binding.getInterval() + "s)" : "手动";
+            String camMode = binding.getCameraMode() == RecorderBinding.MODE_VELOCITY ? "速度" : "数据包";
             sender.sendMessage(Component.text()
                     .append(Component.text("  " + recorderName, NamedTextColor.YELLOW))
                     .append(Component.text(" -> ", NamedTextColor.GRAY))
                     .append(Component.text(targetName, NamedTextColor.GREEN))
-                    .append(Component.text(" [" + mode + "]", NamedTextColor.AQUA))
+                    .append(Component.text(" [" + mode + "] ", NamedTextColor.AQUA))
+                    .append(Component.text("镜头: " + camMode, NamedTextColor.LIGHT_PURPLE))
                     .build());
         }
     }
@@ -282,6 +320,7 @@ public class XLCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(Component.text("/xl login <令牌> - 登录系统", NamedTextColor.YELLOW));
             sender.sendMessage(Component.text("/xl camera <distance|pitch> <值> - 调整个人镜头参数", NamedTextColor.YELLOW));
             sender.sendMessage(Component.text("/xl toggle - 切换录制状态（旁观/隐身/无敌）", NamedTextColor.YELLOW));
+            sender.sendMessage(Component.text("/xl mode <velocity|packet> - 切换镜头模式", NamedTextColor.YELLOW));
         }
         if (sender.hasPermission("xmlive.admin")) {
             sender.sendMessage(Component.text("/xl bind <录制者> <目标> - 手动绑定", NamedTextColor.YELLOW));
@@ -298,7 +337,7 @@ public class XLCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             List<String> subs = new ArrayList<>();
             if (sender.hasPermission("xmlive.use")) {
-                subs.addAll(Arrays.asList("login", "camera", "toggle"));
+                subs.addAll(Arrays.asList("login", "camera", "toggle", "mode"));
             }
             if (sender.hasPermission("xmlive.admin")) {
                 subs.addAll(Arrays.asList("bind", "unbind", "auto", "reset", "list", "reload"));
@@ -315,6 +354,11 @@ public class XLCommand implements CommandExecutor, TabCompleter {
             }
             if (sub.equals("camera") && sender.hasPermission("xmlive.use")) {
                 return Arrays.asList("distance", "pitch").stream()
+                        .filter(s -> s.startsWith(args[1].toLowerCase()))
+                        .collect(Collectors.toList());
+            }
+            if (sub.equals("mode") && sender.hasPermission("xmlive.use")) {
+                return Arrays.asList("velocity", "packet").stream()
                         .filter(s -> s.startsWith(args[1].toLowerCase()))
                         .collect(Collectors.toList());
             }

@@ -64,4 +64,7 @@ public class ConfigManager {
     public boolean isParticlesEnabled() {
         return config.getBoolean("visual.particles", false);
     }
+    public double getVelocityStrength() {
+        return config.getDouble("velocity.strength", 0.9);
+    }
 }

@@ -1,7 +1,7 @@
 // src/main/java/com/yourpackage/xmlive/core/LiveCore.java
-package com.xmjjs.xmllive.core;
+package com.xmjjs.xmlive.core;
 
-import com.xmjjs.xmllive.XMLive;
+import com.xmjjs.xmlive.XMLive;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;

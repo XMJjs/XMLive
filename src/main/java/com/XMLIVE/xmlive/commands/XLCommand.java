@@ -1,8 +1,8 @@
-// src/main/java/com/yourpackage/xmlive/commands/XLCommand.java
-package com.yourpackage.xmllive.commands;
+// src/main/java/com/XMLIVE/xmlive/commands/XLCommand.java
+package com.XMLIVE.xmllive.commands;
 
-import com.yourpackage.xmllive.XMLive;
-import com.yourpackage.xmllive.core.RecorderBinding;
+import com.XMLIVE.xmllive.XMLive;
+import com.XMLIVE.xmllive.core.RecorderBinding;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;

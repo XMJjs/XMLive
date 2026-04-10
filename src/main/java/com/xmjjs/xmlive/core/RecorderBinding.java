@@ -6,6 +6,9 @@ import java.util.UUID;
 
 public class RecorderBinding {
 
+    public static final int MODE_VELOCITY = 0;
+    public static final int MODE_PACKET = 1;
+
     private final UUID recorderUuid;
     private UUID targetUuid;
     private boolean autoMode;
@@ -14,6 +17,7 @@ public class RecorderBinding {
     private double customPitch = -1.0;
     private boolean spectatorMode = false;
     private GameMode previousGameMode;
+    private int cameraMode = MODE_VELOCITY;
 
     public RecorderBinding(UUID recorderUuid, UUID targetUuid, boolean autoMode, int interval) {
         this.recorderUuid = recorderUuid;
@@ -88,5 +92,13 @@ public class RecorderBinding {
 
     public void setPreviousGameMode(GameMode previousGameMode) {
         this.previousGameMode = previousGameMode;
+    }
+
+    public int getCameraMode() {
+        return cameraMode;
+    }
+
+    public void setCameraMode(int cameraMode) {
+        this.cameraMode = cameraMode;
     }
 }

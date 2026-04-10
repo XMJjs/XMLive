@@ -39,7 +39,7 @@ jobs:
 
       # 5. 使用 Gradle 构建插件
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: gradlew clean build
 
       # 6. 创建 Release 并上传构建产物
       - name: Create Release and Upload Asset

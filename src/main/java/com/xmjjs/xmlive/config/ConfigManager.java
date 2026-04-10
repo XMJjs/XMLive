@@ -57,6 +57,11 @@ public class ConfigManager {
         return config.getInt("update.frequency", 2);
     }
 
+    // ⭐ 确保这一行存在
+    public double getVelocityStrength() {
+        return config.getDouble("velocity.strength", 0.9);
+    }
+
     public boolean isGlowingEnabled() {
         return config.getBoolean("visual.glowing", true);
     }

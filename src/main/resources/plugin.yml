@@ -4,11 +4,12 @@ main: com.xmjjs.xmlive.XMLive
 api-version: '1.21'
 author: YourName
 description: A third-person camera follow system for live streaming.
+depend: [PacketEvents]
 
 commands:
   xl:
     description: XMLIVE 主命令
-    usage: /<command> <login|bind|unbind|auto|camera|toggle|reset|list|reload>
+    usage: /<command> <login|bind|unbind|auto|camera|toggle|mode|reset|list|reload>
 
 permissions:
   xmlive.use:

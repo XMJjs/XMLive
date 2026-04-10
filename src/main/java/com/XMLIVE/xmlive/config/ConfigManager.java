@@ -1,7 +1,7 @@
-// src/main/java/com/yourpackage/xmlive/config/ConfigManager.java
-package com.yourpackage.xmllive.config;
+// src/main/java/com/XMLIVE/xmlive/config/ConfigManager.java
+package com.XMLIVE.xmllive.config;
 
-import com.yourpackage.xmllive.XMLive;
+import com.XMLIVE.xmllive.XMLive;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.List;

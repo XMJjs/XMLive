@@ -54,11 +54,11 @@ public class ConfigManager {
     }
 
     public int getUpdateFrequency() {
-        return config.getInt("update.frequency", 2);
+        return config.getInt("update.frequency", 1);
     }
 
     public double getVelocityStrength() {
-        return config.getDouble("velocity.strength", 0.9);
+        return config.getDouble("velocity.strength", 1.0);
     }
 
     public boolean isGlowingEnabled() {
@@ -67,15 +67,5 @@ public class ConfigManager {
 
     public boolean isParticlesEnabled() {
         return config.getBoolean("visual.particles", false);
-    }
-
-    // 新增：获取镜头位置平滑因子
-    public double getCameraSmoothFactor() {
-        return config.getDouble("camera.smooth-factor", 0.3);
-    }
-
-    // 新增：获取视角旋转平滑因子
-    public double getCameraRotationSmoothFactor() {
-        return config.getDouble("camera.rotation-smooth-factor", 0.5);
     }
 }

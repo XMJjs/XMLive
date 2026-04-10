@@ -1,0 +1,17 @@
+name: XMLIVE
+version: ${version}
+main: com.xmjjs.xmlive.XMLive
+api-version: '1.21'
+author: YourName
+description: A third-person camera follow system for live streaming.
+commands:
+  xl:
+    description: XMLIVE 主命令
+    usage: /<command> <bind|unbind|auto|time|reset|list|reload|login>
+permissions:
+  xmlive.*:
+    description: XMLIVE 全部权限
+    default: op
+  xmlive.use:
+    description: 允许使用 XMLIVE 功能
+    default: op

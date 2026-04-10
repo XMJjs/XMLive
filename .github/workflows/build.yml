@@ -33,7 +33,7 @@ jobs:
       - name: Get plugin version
         id: get_version
         run: |
-          VERSION=$(./gradlew printVersion --quiet)
+          VERSION=$(gradlew printVersion --quiet)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "Plugin version: $VERSION"
 

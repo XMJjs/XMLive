@@ -5,7 +5,7 @@ plugins {
     java
 }
 
-group = "XMLIVE"      // 替换成你的包名
+group = "xmjjs"      // 替换成你的包名
 version = "1.0.0"              // 你的插件版本
 
 repositories {

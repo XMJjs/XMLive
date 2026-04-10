@@ -1,5 +1,8 @@
 package com.xmjjs.xmlive;
 
+import com.github.retrooper.packetevents.PacketEvents;
+import com.github.retrooper.packetevents.PacketEventsBuilder;
+import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import com.xmjjs.xmlive.auth.AuthManager;
 import com.xmjjs.xmlive.commands.XLCommand;
 import com.xmjjs.xmlive.config.ConfigManager;
@@ -16,9 +19,18 @@ public final class XMLive extends JavaPlugin {
     private LiveCore liveCore;
 
     @Override
+    public void onLoad() {
+        PacketEventsBuilder builder = SpigotPacketEventsBuilder.build(this);
+        PacketEvents.setAPI(builder);
+        PacketEvents.getAPI().load();
+    }
+
+    @Override
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
+
+        PacketEvents.getAPI().init();
 
         configManager = new ConfigManager(this);
         authManager = new AuthManager(this);
@@ -36,6 +48,7 @@ public final class XMLive extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        PacketEvents.getAPI().terminate();
         if (liveCore != null) {
             liveCore.shutdown();
         }

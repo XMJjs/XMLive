@@ -4,7 +4,7 @@ main: com.xmjjs.xmlive.XMLive
 api-version: '1.21'
 author: YourName
 description: A third-person camera follow system for live streaming.
-depend: [PacketEvents]
+softdepend: [packetevents]   # 使用正确的全小写名称，且改为软依赖
 
 commands:
   xl:
